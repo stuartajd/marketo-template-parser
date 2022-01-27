@@ -1,0 +1,17 @@
+{
+  "name": "Marketo Guided Template Parser",
+  "description": "Speeds up the development of Marketo templates by prefilling the default values for the mkto meta tags",
+  "version": "0.1",
+  "manifest_version": 3,
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "run_at": "document_end",
+    "js": ["parser.js"]
+  }],
+  "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}
