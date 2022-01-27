@@ -1,15 +1,50 @@
-'use strict';
-
+/**
+ * Marketo Template Parser
+ *
+ * Speeds up the development of Marketo templates by prefilling the default values for the mkto meta tags.
+ *
+ * @link   https://github.com/stuartajd/marketo-template-parser
+ * @author Stuart Davidson <me@stuartd.co.uk>
+ */
 (function(){
-	// Parse the template
-	window.addEventListener('DOMContentLoaded', setup);
+	/**
+	 * Configuration options for the specific tags that may change value 
+	 */
+	const mktoFunctionMap = {
+		mktoBoolean: mktoBoolean
+	}
 
-	// Set the virtual DOM up
-	let htmlContent = null;
+	/**
+	 * Sets the value of any elements that need have a boolean meta tag.
+	 * 
+	 * @param 	{String} 	htmlContent 	The current copy of the HTML content to be replaced.
+	 * @param 	{Tag} 		tag 			Marketo meta tag parsed details
+	 * @returns {String} 	htmlContent 	The updated HTML content after being replaced.
+	 */
+	function mktoBoolean(htmlContent, tag){
+		const value = tag.default === 'true' ? tag.true_value : tag.false_value;
+		return htmlContent.replaceAll("${"+ tag.id +"}", value);
+	}
 
-	function setup() {
-		htmlContent = document.documentElement.innerHTML;
+	/**
+	 * Sets the value of any elements to be the default value.
+	 * 
+	 * @param 	{String} 	htmlContent 	The current copy of the HTML content to be replaced.
+	 * @param 	{Tag} 		tag 			Marketo meta tag parsed details
+	 * @returns {String} 	htmlContent 	The updated HTML content after being replaced.
+	 */
+	function mktoDefault(htmlContent, tag){
+		return htmlContent.replaceAll("${"+ tag.id +"}", tag.default);
+	}
 
+	window.addEventListener('DOMContentLoaded', () => {
+		let htmlContent = document.documentElement.innerHTML;
+
+		/** 
+		 * Grab out the meta elements that contain Marketo editable tags.
+		 * Update each of the elements & update our htmlContent variable.
+		 * Set the innerHTML of the document to be our htmlContent once for performance.
+		 */
 		const marketoAttributes = [...document.documentElement.querySelectorAll("meta[class^=mkto]")].map(tag => {
 			return {
 				id: tag.id,
@@ -25,26 +60,10 @@
 		});
 
 		marketoAttributes.forEach(tag => {
-			// Update the htmlContent value
-			const setTagValue = setTagMap[tag.type] || setTagMap['mktoString'];
-			htmlContent = setTagValue(tag);
+			const mktoFunction = mktoFunctionMap[tag.type] || mktoDefault;
+			htmlContent = mktoFunction(htmlContent, tag);
 		});
 
-		// Update the actual DOM inner HTML 
-		document.documentElement.innerHTML = htmlContent;
-	}
-
-	const setTagMap = {
-		mktoString: mktoString,
-		mktoBoolean: mktoBoolean
-	}
-	
-	function mktoBoolean(tag){
-		const value = tag.default === 'true' ? tag.true_value : tag.false_value;
-		return htmlContent.replaceAll("${"+ tag.id +"}", value);
-	}
-
-	function mktoString(tag){
-		return htmlContent.replaceAll("${"+ tag.id +"}", tag.default);
-	}
+		document.documentElement.innerHTML = htmlContent;	
+	});
 })();
