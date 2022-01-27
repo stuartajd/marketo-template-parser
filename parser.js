@@ -16,10 +16,6 @@
 
 	/**
 	 * Sets the value of any elements that need have a boolean meta tag.
-	 * 
-	 * @param 	{String} 	htmlContent 	The current copy of the HTML content to be replaced.
-	 * @param 	{Tag} 		tag 			Marketo meta tag parsed details
-	 * @returns {String} 	htmlContent 	The updated HTML content after being replaced.
 	 */
 	function mktoBoolean(htmlContent, tag){
 		const value = tag.default === 'true' ? tag.true_value : tag.false_value;
@@ -28,10 +24,6 @@
 
 	/**
 	 * Sets the value of any elements to be the default value.
-	 * 
-	 * @param 	{String} 	htmlContent 	The current copy of the HTML content to be replaced.
-	 * @param 	{Tag} 		tag 			Marketo meta tag parsed details
-	 * @returns {String} 	htmlContent 	The updated HTML content after being replaced.
 	 */
 	function mktoDefault(htmlContent, tag){
 		return htmlContent.replaceAll("${"+ tag.id +"}", tag.default);
