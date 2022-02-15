@@ -5,7 +5,7 @@
  *
  * @link   	https://github.com/stuartajd/marketo-template-parser
  * @author 	Stuart Davidson <me@stuartd.co.uk>
- * @version 0.1
+ * @version 0.2
  */
 (() => {
 	/**
@@ -30,8 +30,17 @@
 		return htmlContent.replaceAll("${"+ tag.id +"}", tag.default);
 	}
 
+	/**
+	 * Event listener for page load
+	 */
 	window.addEventListener('load', () => {
 		let htmlContent = document.documentElement.innerHTML;
+
+		/**
+		 * Check if there is atleast one mktoMeta Element, otherwise stop.
+		 */
+		const hasOneMeta = document.documentElement.querySelector("meta[class^=mkto]");
+		if(!hasOneMeta) return console.warn("[Marketo Template Parser]: No Marketo attributes found");
 
 		/** 
 		 * Grab out the meta elements that contain Marketo editable tags.
@@ -58,5 +67,6 @@
 		});
 
 		document.documentElement.innerHTML = htmlContent;	
+		return console.log(`[Marketo Template Parser]: ${marketoAttributes.length} parsed and content updated`);
 	});
 })();
