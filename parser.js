@@ -5,7 +5,7 @@
  *
  * @link   	https://github.com/stuartajd/marketo-template-parser
  * @author 	Stuart Davidson <me@stuartd.co.uk>
- * @version 0.1
+ * @version 0.3
  */
 (() => {
 	/**
@@ -27,10 +27,37 @@
 	 * Sets the value of any elements to be the default value.
 	 */
 	function mktoDefault(htmlContent, tag) {
-		return htmlContent.replaceAll("${"+ tag.id +"}", tag.default);
+		const value = tag.allowhtml === 'true' ? tag.default : escapeHTML(tag.default);
+		return htmlContent.replaceAll("${"+ tag.id +"}", `${value}${(tag.unit ?? '')}`);
 	}
 
-	window.addEventListener('DOMContentLoaded', () => {
+	/**
+	 * Escapes HTML special characters in a string.
+	 */
+	function escapeHTML(string) {
+		return string.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#39;");
+	}
+
+	/**
+	 * Parses the document and updates Marketo tags with default values.
+	 */
+	function parseDocument() {
+		console.groupCollapsed('[Marketo Template Parser script]');
+		console.info("Starting to parse document...");
+
+		/**
+		 * Check if there is atleast one mktoMeta Element, otherwise stop.
+		 */
+		const hasOneMeta = document.documentElement.querySelector("meta[class^=mkto]");
+		if(!hasOneMeta) {
+		 	console.info("Could not find any Marketo attributes");
+			return console.groupEnd();
+		}
+
 		let htmlContent = document.documentElement.innerHTML;
 
 		/** 
@@ -44,6 +71,7 @@
 				type: tag.classList[0],
 				name: tag.getAttribute("mktoName"),
 				default: tag.getAttribute("default"),
+				unit: tag.getAttribute("unit"),
 				allowhtml: tag.getAttribute("allowhtml"),
 				true_value: tag.getAttribute("true_value"),
 				false_value: tag.getAttribute("false_value"),
@@ -58,5 +86,10 @@
 		});
 
 		document.documentElement.innerHTML = htmlContent;	
-	});
+		
+	 	console.log(`Parsing completed, ${marketoAttributes.length} tags parsed and content updated`);
+		console.groupEnd();
+	}
+
+	window.addEventListener('DOMContentLoaded', parseDocument);
 })();

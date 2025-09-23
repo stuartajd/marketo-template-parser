@@ -5,7 +5,7 @@
  *
  * @link   	https://github.com/stuartajd/marketo-template-parser
  * @author 	Stuart Davidson <me@stuartd.co.uk>
- * @version 0.2
+ * @version 0.3
  */
 (() => {
 	/**
@@ -27,20 +27,38 @@
 	 * Sets the value of any elements to be the default value.
 	 */
 	function mktoDefault(htmlContent, tag) {
-		return htmlContent.replaceAll("${"+ tag.id +"}", tag.default);
+		const value = tag.allowhtml === 'true' ? tag.default : escapeHTML(tag.default);
+		return htmlContent.replaceAll("${"+ tag.id +"}", `${value}${(tag.unit ?? '')}`);
 	}
 
 	/**
-	 * Event listener for page load
+	 * Escapes HTML special characters in a string.
 	 */
-	window.addEventListener('load', () => {
-		let htmlContent = document.documentElement.innerHTML;
+	function escapeHTML(string) {
+		return string.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#39;");
+	}
+
+	/**
+	 * Parses the document and updates Marketo tags with default values.
+	 */
+	function parseDocument() {
+		console.groupCollapsed('[Marketo Template Parser extension]');
+		console.info("Starting to parse document...");
 
 		/**
 		 * Check if there is atleast one mktoMeta Element, otherwise stop.
 		 */
 		const hasOneMeta = document.documentElement.querySelector("meta[class^=mkto]");
-		if(!hasOneMeta) return console.warn("[Marketo Template Parser]: No Marketo attributes found");
+		if(!hasOneMeta) {
+		 	console.info("Could not find any Marketo attributes");
+			return console.groupEnd();
+		}
+
+		let htmlContent = document.documentElement.innerHTML;
 
 		/** 
 		 * Grab out the meta elements that contain Marketo editable tags.
@@ -53,6 +71,7 @@
 				type: tag.classList[0],
 				name: tag.getAttribute("mktoName"),
 				default: tag.getAttribute("default"),
+				unit: tag.getAttribute("unit"),
 				allowhtml: tag.getAttribute("allowhtml"),
 				true_value: tag.getAttribute("true_value"),
 				false_value: tag.getAttribute("false_value"),
@@ -67,6 +86,10 @@
 		});
 
 		document.documentElement.innerHTML = htmlContent;	
-		return console.log(`[Marketo Template Parser]: ${marketoAttributes.length} parsed and content updated`);
-	});
+		
+	 	console.log(`Parsing completed, ${marketoAttributes.length} tags parsed and content updated`);
+		console.groupEnd();
+	}
+
+	parseDocument();
 })();
