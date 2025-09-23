@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Marketo variables</title>
+    <meta class="mktoBoolean" id="testBoolean" mktoName="Test Boolean" default="true" true_value="Yes" false_value="No">
+    <meta class="mktoString" id="testString" mktoName="Test String" default="<strong>This is a test string</strong>" allowHTML="false">
+    <meta class="mktoString" id="testHTMLString" mktoName="Test String" default="<strong>This is a test HTML string</strong>" allowHTML="true">
+    <meta class="mktoNumber" id="testNumber" mktoName="Test Number" default="10" unit="px">
+    <meta class="mktoNumber" id="testNumberNoUnit" mktoName="Test Number" default="10">
+</head>
+<body>
+    <h1>Test Marketo variables</h1>
+    <p>Boolean: ${testBoolean}</p>
+    <p>String: ${testString}</p>
+    <p>HTML String: ${testHTMLString}</p>
+    <p>Number: ${testNumber}</p>
+    <p>Number No Unit: ${testNumberNoUnit}</p>
+
+    <script src="parser.js"></script>
+</body>
+</html>
