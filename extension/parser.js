@@ -5,7 +5,7 @@
  *
  * @link   	https://github.com/stuartajd/marketo-template-parser
  * @author 	Stuart Davidson <me@stuartd.co.uk>
- * @version 0.3
+ * @version 0.4
  */
 (() => {
 	/**
@@ -28,7 +28,7 @@
 	 */
 	function mktoDefault(htmlContent, tag) {
 		const value = tag.allowhtml === 'true' ? tag.default : escapeHTML(tag.default);
-		return htmlContent.replaceAll("${"+ tag.id +"}", `${value}${(tag.unit ?? '')}`);
+		return htmlContent.replaceAll("${"+ tag.id +"}", `${value}${(tag.units ?? '')}`);
 	}
 
 	/**
@@ -71,7 +71,7 @@
 				type: tag.classList[0],
 				name: tag.getAttribute("mktoName"),
 				default: tag.getAttribute("default"),
-				unit: tag.getAttribute("unit"),
+				units: tag.getAttribute("units"),
 				allowhtml: tag.getAttribute("allowhtml"),
 				true_value: tag.getAttribute("true_value"),
 				false_value: tag.getAttribute("false_value"),
@@ -85,9 +85,10 @@
 			htmlContent = mktoFunction(htmlContent, tag);
 		});
 
+		console.log(`Parsing completed, ${marketoAttributes.length} tags found`);
+		console.log('Marketo attributes found:', marketoAttributes);
 		document.documentElement.innerHTML = htmlContent;	
-		
-	 	console.log(`Parsing completed, ${marketoAttributes.length} tags parsed and content updated`);
+		console.info("Document content updated");
 		console.groupEnd();
 	}
 
